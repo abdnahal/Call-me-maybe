@@ -1,5 +1,5 @@
 import argparse
-from typing import List, Any
+from typing import Any
 
 
 def argparser() -> Any:

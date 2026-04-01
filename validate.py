@@ -1,12 +1,12 @@
-from pydantic import Basemodel
+from pydantic import BaseModel
 from typing import Dict
 
 
-class FunctionParam(Basemodel):
+class FunctionParam(BaseModel):
     type: str
 
 
-class Functiondef(Basemodel):
+class Functiondef(BaseModel):
     name: str
     description: str
     parameters: Dict[str, FunctionParam]
