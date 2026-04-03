@@ -12,4 +12,9 @@ def token_to_id(vocab: Dict) -> Dict[str, int]:
     token_id = {k: int(v) for k, v in vocab.items()}
     return token_id
 
-def get_valid_tokens()
+
+def get_vocab(model: Small_LLM_Model):
+    path = model.get_path_to_vocab_file()
+    with open(path, 'r') as f:
+        vocab = json.load(f)
+        return vocab
