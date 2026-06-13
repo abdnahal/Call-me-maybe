@@ -11,8 +11,9 @@ def main():
     vocab = get_vocab(model)
     print(ids.tolist())
     logits = model.get_logits_from_input_ids(ids.tolist()[0])
-    valid = [vocab[i] for i, logit in enumerate(logits) if logit > 0]
-    print(valid)
+    print(vocab)
+    # valid = [vocab[i] for i, logit in enumerate(logits) if logit > 0]
+    # print(valid)
 
 
 if __name__ == "__main__":
