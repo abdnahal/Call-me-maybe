@@ -7,8 +7,10 @@ clean:
 	rm *.egg-info
 debug:
 	python -m pdb -m src
+
 install:
 	uv sync
+	pip install torch transformers
 
 run:
 	uv run python -m src
