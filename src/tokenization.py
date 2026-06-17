@@ -24,10 +24,8 @@ class Tokenization:
             vocab = json.load(f)
             return vocab
 
-    def get_valid_tokens(self, so_far: List[int]):
+    def get_valid_tokens(self, so_far: List[int], functions: List[str]):
         valid = []
-        functions = ["fn_add_numbers", "fn_greet", "fn_reverse_string",
-                     "fn_substitute_string_with_regex", "fn_get_square_root"]
         for id, token in self.id_token.items():
             if not token:
                 continue

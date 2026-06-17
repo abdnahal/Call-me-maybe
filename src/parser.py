@@ -1,7 +1,7 @@
 import json
 import sys
 from validate import Functiondef
-from typing import Dict, List, Union
+from typing import Dict, Union
 from pydantic import ValidationError
 
 
@@ -10,8 +10,8 @@ def functiondefs(filename: str) -> Union[list, Dict]:
         with open(filename, 'r') as f:
             defs = json.load(f)
             funcs = [Functiondef(**item) for item in defs]
-            funcs.clear()
-            return defs
+            # funcs.clear()
+            return (funcs, defs)
     except json.JSONDecodeError as e:
         print(f'error loading json file {filename}: {e}')
         sys.exit(1)
@@ -20,6 +20,7 @@ def functiondefs(filename: str) -> Union[list, Dict]:
         sys.exit(1)
     except ValidationError as e:
         print(e)
+    return funcs
 
 
 def prompts(filename: str) -> Union[list, Dict]:
