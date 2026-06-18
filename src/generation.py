@@ -86,8 +86,10 @@ Examples:\n{examp}\n\
             break
         if "}" in token:
             count = sum([1 for c in so_far if c == '{'])
-            so_far += token.split("}", 1)[0] + "}" * count
-            break
+            count_clo = sum([1 for c in so_far if c == '}'])
+            if count - 1 == count_clo:
+                so_far += token.split('}')[0] + '}'
+                break
         so_far += token
         ids.append(tok)
     return so_far
