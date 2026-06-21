@@ -10,7 +10,6 @@ debug:
 
 install:
 	uv sync
-	pip install torch transformers
 
 run:
 	uv run python -m src

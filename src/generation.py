@@ -14,23 +14,22 @@ def build_selection_prompt(prompt: str, functions: list[Functiondef]) -> str:
     )
 
 
-def generate_response(model: Small_LLM_Model, prompt: str, possible_values: List[str]):
+def generate_response(model: Small_LLM_Model, prompt: str, possible_values: List[str], tokenize: Tokenization):
     so_far = ""
     ids = model.encode(prompt)
     ids = ids.tolist()[0]
-    tokenize = Tokenization(model)
     for _ in range(100):
         valid = tokenize.get_valid_tokens(so_far, possible_values)
         logits = tokenize.apply_mask(valid, ids)
         tok = int(argmax(logits))
         if so_far in possible_values:
             break
-        so_far += tokenize.id_to_token()[tok]
+        so_far += tokenize.id_token[tok]
         ids.append(tok)
     return so_far
 
 
-def get_parameters(model: Small_LLM_Model, func: str, prompt: str) -> str:
+def get_parameters(model: Small_LLM_Model, func: str, prompt: str, tokenize: Tokenization) -> str:
     examp = [
         {
             "prompt": "What is the sum of 2 and 3?",
@@ -61,17 +60,16 @@ def get_parameters(model: Small_LLM_Model, func: str, prompt: str) -> str:
     ]
     prompt = f"Give me the function parameters in json format of : {func}\
 as parameter: value\n\
-Examples:\n{examp}\n\
+Examples:\n{examp}\nDon't copy the examples!\n\
 'prompt': {prompt},\n\
 'parameters':"
     ids = model.encode(prompt).tolist()[0]
     so_far = ""
-    tokenize = Tokenization(model)
     for _ in range(100):
         logits = model.get_logits_from_input_ids(ids)
         tok = argmax(logits)
         # print(tokenize.id_to_token()[tok])
-        token = tokenize.id_to_token()[tok]
+        token = tokenize.id_token[tok]
         if "{" in token:
             so_far += token
             ids.append(tok)
@@ -80,7 +78,7 @@ Examples:\n{examp}\n\
     for _ in range(100):
         logits = model.get_logits_from_input_ids(ids)
         tok = argmax(logits)
-        token = tokenize.id_to_token()[tok]
+        token = tokenize.id_token[tok]
         # print(token)
         if token in ["!<", "!\n", "\n", "!", "Ċ", "ĊĊ"]:
             break
