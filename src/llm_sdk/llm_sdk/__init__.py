@@ -9,10 +9,10 @@ from transformers import AutoModelForCausalLM, AutoTokenizer, PreTrainedTokenize
 from huggingface_hub import hf_hub_download, snapshot_download
 import os
 
-snapshot_download(
-    repo_id="Qwen/Qwen3-0.6B",
-    local_dir="./Qwen3-0.6B"
-)
+# snapshot_download(
+#     repo_id="Qwen/Qwen3-0.6B",
+#     local_dir="./Qwen3-0.6B"
+# )
 
 logging.set_verbosity_error()  # keep the console clean
 

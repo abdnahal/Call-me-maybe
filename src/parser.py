@@ -1,6 +1,6 @@
 import json
 import sys
-from validate import Functiondef
+from .validate import Functiondef
 from typing import Dict, Union
 from pydantic import ValidationError
 

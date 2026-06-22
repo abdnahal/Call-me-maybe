@@ -1,6 +1,6 @@
 import json
 from typing import List, Dict
-from llm_sdk.llm_sdk import Small_LLM_Model
+from .llm_sdk.llm_sdk import Small_LLM_Model
 
 
 class Tokenization:
@@ -24,7 +24,7 @@ class Tokenization:
             vocab = json.load(f)
             return vocab
 
-    def get_valid_tokens(self, so_far: List[int], functions: List[str]):
+    def get_valid_tokens(self, so_far: str, functions: List[str]):
         valid = []
         for id, token in self.id_token.items():
             if not token:

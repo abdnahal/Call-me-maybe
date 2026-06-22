@@ -1,8 +1,8 @@
 from typing import List, Dict, Any
-from llm_sdk.llm_sdk import Small_LLM_Model
-from tokenization import Tokenization
+from .llm_sdk.llm_sdk import Small_LLM_Model
+from .tokenization import Tokenization
 from numpy import argmax
-from validate import Functiondef
+from .validate import Functiondef
 
 
 def build_selection_prompt(prompt: str, functions: list[Functiondef]) -> str:
@@ -14,7 +14,8 @@ def build_selection_prompt(prompt: str, functions: list[Functiondef]) -> str:
     )
 
 
-def generate_response(model: Small_LLM_Model, prompt: str, possible_values: List[str], tokenize: Tokenization):
+def generate_response(model: Small_LLM_Model, prompt: str,
+                      possible_values: List[str], tokenize: Tokenization):
     so_far = ""
     ids = model.encode(prompt)
     ids = ids.tolist()[0]
@@ -29,7 +30,8 @@ def generate_response(model: Small_LLM_Model, prompt: str, possible_values: List
     return so_far
 
 
-def get_parameters(model: Small_LLM_Model, func: str, prompt: str, tokenize: Tokenization) -> str:
+def get_parameters(model: Small_LLM_Model, func: str, prompt: str,
+                   tokenize: Tokenization) -> str:
     examp = [
         {
             "prompt": "What is the sum of 2 and 3?",
@@ -86,8 +88,9 @@ Examples:\n{examp}\nDon't copy the examples!\n\
             count = sum([1 for c in so_far if c == '{'])
             count_clo = sum([1 for c in so_far if c == '}'])
             if count - 1 == count_clo:
-                so_far += token.split('}')[0] + '}'
-                break
+                so_far += token.split('}')[0]
+                so_far += '}'
+                return so_far
         so_far += token
         ids.append(tok)
     return so_far
