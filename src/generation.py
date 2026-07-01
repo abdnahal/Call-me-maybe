@@ -22,6 +22,7 @@ def generate_response(model: Small_LLM_Model, prompt: str,
     for _ in range(100):
         valid = tokenize.get_valid_tokens(so_far, possible_values)
         logits = tokenize.apply_mask(valid, ids)
+        print(so_far)
         tok = int(argmax(logits))
         if so_far in possible_values:
             break
