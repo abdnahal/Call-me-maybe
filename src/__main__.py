@@ -6,7 +6,7 @@ from .llm_sdk.llm_sdk import Small_LLM_Model
 from .generation import generate_response, build_selection_prompt
 from .generation import get_parameters
 import json
-import ast
+# import ast
 
 
 def argparser() -> Any:
@@ -37,10 +37,11 @@ def main():
         res["name"] = response
         parameters = get_parameters(model, response, prom["prompt"], tokenizer)
         parameters = parameters.replace("Ġ", " ")
-        res["parameters"] = ast.literal_eval(parameters)
+        print(parameters)
+        res["parameters"] = json.loads(parameters)
         final.append(res)
-    with open(args.output, 'w') as f:
-        json.dump(final, f)
+    with open(args.output, 'w', encoding='utf-8') as f:
+        json.dump(final, f, indent=2)
 
 
 if __name__ == "__main__":

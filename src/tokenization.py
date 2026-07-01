@@ -39,6 +39,6 @@ class Tokenization:
 
     def apply_mask(self, valid: List[int], ids: List[int]):
         logits = self.model.get_logits_from_input_ids(ids)
-        masked = [logits[i] if i in valid else float("-inf")
-                  for i, _ in enumerate(logits)]
+        masked = [logits[tok] for tok in valid]
+        print(f"masked: {masked}    valid: {valid}")
         return masked

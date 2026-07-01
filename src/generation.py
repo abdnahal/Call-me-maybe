@@ -1,4 +1,4 @@
-from typing import List, Dict, Any
+from typing import List
 from .llm_sdk.llm_sdk import Small_LLM_Model
 from .tokenization import Tokenization
 from numpy import argmax
@@ -25,7 +25,7 @@ def generate_response(model: Small_LLM_Model, prompt: str,
         tok = int(argmax(logits))
         if so_far in possible_values:
             break
-        so_far += tokenize.id_token[tok]
+        so_far += tokenize.id_token[valid[tok]]
         ids.append(tok)
     return so_far
 
@@ -44,12 +44,13 @@ def get_parameters(model: Small_LLM_Model, func: str, prompt: str,
             "parameters": {"s": "hello"},
         },
         {
-            "prompt": "Substitute the word cat with dog in this string 'the cat ate some meat'",
+            "prompt": "Replace all vowels in 'Programming is fun' \
+with asterisks",
             "name": "fn_substitute_string_with_regex",
             "parameters": {
-                "source_string": {"s": "the cat ate some meat"},
-                "regex": {"a": "cat"},
-                "replacement": {"b": "dog"},
+                "source_string": "Programming is fun",
+                "regex": "([aeiouAEIOU])",
+                "replacement": "*",
             },
         },
         {
@@ -60,36 +61,36 @@ def get_parameters(model: Small_LLM_Model, func: str, prompt: str,
             },
         },
     ]
-    prompt = f"Give me the function parameters in json format of : {func}\
-as parameter: value\n\
-Examples:\n{examp}\nDon't copy the examples!\n\
+    prompt = f"Give me the function parameters of : {func}\n\
+Examples:\n{examp}\n\
+I need valid JSON format with double quotes instead of single quotes!\n\
 'prompt': {prompt},\n\
 'parameters':"
     ids = model.encode(prompt).tolist()[0]
     so_far = ""
-    for _ in range(100):
+    token = ""
+    while '{' not in token:
         logits = model.get_logits_from_input_ids(ids)
         tok = argmax(logits)
-        # print(tokenize.id_to_token()[tok])
         token = tokenize.id_token[tok]
-        if "{" in token:
-            so_far += token
-            ids.append(tok)
-            break
         ids.append(tok)
+    if "'" in token:
+        token = token.replace("'", '"')
+        ids[-1] = tokenize.token_id[token]
+    so_far += token
     for _ in range(100):
         logits = model.get_logits_from_input_ids(ids)
         tok = argmax(logits)
         token = tokenize.id_token[tok]
-        # print(token)
         if token in ["!<", "!\n", "\n", "!", "Ċ", "ĊĊ"]:
             break
         if "}" in token:
             count = sum([1 for c in so_far if c == '{'])
             count_clo = sum([1 for c in so_far if c == '}'])
-            if count - 1 == count_clo:
+            clo_tok = sum([1 for c in token if c == '}'])
+            if count <= count_clo + clo_tok:
                 so_far += token.split('}')[0]
-                so_far += '}'
+                so_far += '}' * (count - count_clo)
                 return so_far
         so_far += token
         ids.append(tok)
