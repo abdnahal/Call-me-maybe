@@ -20,13 +20,15 @@ def generate_response(model: Small_LLM_Model, prompt: str,
     ids = model.encode(prompt)
     ids = ids.tolist()[0]
     for _ in range(100):
-        valid = tokenize.get_valid_tokens(so_far, possible_values)
-        logits = tokenize.apply_mask(valid, ids)
-        print(so_far)
-        tok = int(argmax(logits))
         if so_far in possible_values:
             break
+        valid = tokenize.get_valid_tokens(so_far, possible_values)
+        if not valid:
+            break
+        logits = tokenize.apply_mask(valid, ids)
+        tok = int(argmax(logits))
         so_far += tokenize.id_token[valid[tok]]
+        print(so_far)
         ids.append(tok)
     return so_far
 
