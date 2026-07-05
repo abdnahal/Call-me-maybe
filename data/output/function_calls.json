@@ -1,13 +1,5 @@
 [
   {
-    "prompt": "Format template: Hello {user}'s profile!",
-    "name": "fn_format_template",
-    "parameters": {
-      "a": 2.0,
-      "b": 3.0
-    }
-  },
-  {
     "prompt": "What is the product of 3 and 5?",
     "name": "fn_format_template",
     "parameters": {
@@ -76,6 +68,14 @@
     "parameters": {
       "a": 2,
       "b": 3
+    }
+  },
+  {
+    "prompt": "Format template: Hello {user}'s profile!",
+    "name": "fn_format_template",
+    "parameters": {
+      "a": 2.0,
+      "b": 3.0
     }
   },
   {
