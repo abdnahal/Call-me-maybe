@@ -8,9 +8,10 @@ from .validate import Functiondef
 def build_selection_prompt(prompt: str, functions: list[Functiondef]) -> str:
     fn_desc = "\n".join(f"- {f.name}: {f.description}" for f in functions)
     return (
+        f"choose the function that's needed to solve the question.\n"
         f"Available functions:\n{fn_desc}\n\n"
         f"Question: {prompt}\n"
-        f"Function to call: "
+        f"Function to call to solve the question: "
     )
 
 
@@ -63,10 +64,11 @@ with asterisks",
             },
         },
     ]
-    prompt = f"Give me the function parameters of : {func}\n\
+    prompt = f"Give me the function call parameters.\
 Examples:\n{examp}\n\
-I need valid JSON format with double quotes instead of single quotes!\n\
+Valid JSON format expected!\n\
 'prompt': {prompt},\n\
+'name': {func}\n\
 'parameters':"
     ids = model.encode(prompt).tolist()[0]
     so_far = ""
@@ -86,11 +88,10 @@ I need valid JSON format with double quotes instead of single quotes!\n\
         token = tokenize.id_token[tok]
         if token in ["!<", "!\n", "\n", "!", "Ċ", "ĊĊ"]:
             break
-        if "'" in token:
-            count = sum([1 for c in so_far if c == '{'])
-            if count == 1:
-                token = token.replace("'", '"')
-                tok = tokenize.token_id[token]
+        if "'" in token and so_far.strip('Ġ') == '{':
+            print("entered")
+            token = token.replace("'", '"')
+            tok = tokenize.token_id[token]
         if "}" in token:
             count = sum([1 for c in so_far if c == '{'])
             count_clo = sum([1 for c in so_far if c == '}'])

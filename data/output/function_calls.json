@@ -1,7 +1,15 @@
 [
   {
+    "prompt": "Format template: Hello {user}'s profile!",
+    "name": "fn_format_template",
+    "parameters": {
+      "a": 2.0,
+      "b": 3.0
+    }
+  },
+  {
     "prompt": "What is the product of 3 and 5?",
-    "name": "fn_execute_sql_query",
+    "name": "fn_format_template",
     "parameters": {
       "a": 3,
       "b": 5
@@ -9,31 +17,31 @@
   },
   {
     "prompt": "What is the product of 12 and 4?",
-    "name": "fn_execute_sql_query",
+    "name": "fn_multiply_numbers",
     "parameters": {
-      "a": 12,
-      "b": 4
+      "a": 12.0,
+      "b": 4.0
     }
   },
   {
     "prompt": "Is 4 an even number?",
-    "name": "fn_format_template",
+    "name": "fn_is_even",
     "parameters": {
-      "a": 2,
-      "b": 3
+      "a": 4.0,
+      "b": 4.0
     }
   },
   {
     "prompt": "Is 7 an even number?",
-    "name": "fn_format_template",
+    "name": "fn_is_even",
     "parameters": {
-      "a": 2,
-      "b": 3
+      "a": 7,
+      "b": 7
     }
   },
   {
     "prompt": "Calculate compound interest on 1234567.89 at 0.0375 rate for 23 years",
-    "name": "fn_execute_sql_query",
+    "name": "fn_calculate_compound_interest",
     "parameters": {
       "rate": 0.0375,
       "time": 23,
@@ -44,9 +52,7 @@
     "prompt": "Execute SQL query 'SELECT * FROM users' on the production database",
     "name": "fn_execute_sql_query",
     "parameters": {
-      "user_id": "123",
-      "password": "456",
-      "role": "admin"
+      "sql": "SELECT * FROM users"
     }
   },
   {
@@ -58,33 +64,26 @@
   },
   {
     "prompt": "Read the file at /home/user/data.json with utf-8 encoding",
-    "name": "fn_format_template",
+    "name": "fn_read_file",
     "parameters": {
-      "a": 2.0,
-      "b": 3.0
+      "a": 2,
+      "b": 3
     }
   },
   {
     "prompt": "Read C:\\Users\\john\\config.ini with latin-1 encoding",
     "name": "fn_format_template",
     "parameters": {
-      "a": 2.0,
-      "b": 3.0
-    }
-  },
-  {
-    "prompt": "Format template: Hello {user}'s profile!",
-    "name": "fn_format_template",
-    "parameters": {
-      "name": "user",
-      "value": "Mark"
+      "a": 2,
+      "b": 3
     }
   },
   {
     "prompt": "Format template: Say \"hello\" to {name}",
     "name": "fn_format_template",
     "parameters": {
-      "name": "Mark"
+      "a": 2.0,
+      "b": 3.0
     }
   }
 ]
