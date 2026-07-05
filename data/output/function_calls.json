@@ -3,8 +3,8 @@
     "prompt": "What is the product of 3 and 5?",
     "name": "fn_format_template",
     "parameters": {
-      "a": 3,
-      "b": 5
+      "a": 3.0,
+      "b": 5.0
     }
   },
   {
@@ -19,16 +19,14 @@
     "prompt": "Is 4 an even number?",
     "name": "fn_is_even",
     "parameters": {
-      "a": 4.0,
-      "b": 4.0
+      "number": 4.0
     }
   },
   {
     "prompt": "Is 7 an even number?",
     "name": "fn_is_even",
     "parameters": {
-      "a": 7,
-      "b": 7
+      "number": 7.0
     }
   },
   {
@@ -58,16 +56,16 @@
     "prompt": "Read the file at /home/user/data.json with utf-8 encoding",
     "name": "fn_read_file",
     "parameters": {
-      "a": 2,
-      "b": 3
+      "file_path": "data.json",
+      "encoding": "utf-8"
     }
   },
   {
     "prompt": "Read C:\\Users\\john\\config.ini with latin-1 encoding",
     "name": "fn_format_template",
     "parameters": {
-      "a": 2,
-      "b": 3
+      "a": 1,
+      "b": 2
     }
   },
   {

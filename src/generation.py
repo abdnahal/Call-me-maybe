@@ -42,6 +42,11 @@ def get_parameters(model: Small_LLM_Model, func: str, prompt: str,
             "parameters": {"a": 2.0, "b": 3.0},
         },
         {
+            "prompt": "is 3 and odd number?",
+            "name": "fn_is_odd",
+            "parameters": {"number": 3.0},
+        },
+        {
             "prompt": "Reverse the string 'hello'",
             "name": "fn_reverse_string",
             "parameters": {"s": "hello"},
@@ -70,6 +75,7 @@ Valid JSON format expected!\n\
 'prompt': {prompt},\n\
 'name': {func}\n\
 'parameters':"
+    print(prompt)
     ids = model.encode(prompt).tolist()[0]
     so_far = ""
     token = ""
@@ -81,6 +87,9 @@ Valid JSON format expected!\n\
     if "'" in token:
         token = token.replace("'", '"')
         ids[-1] = tokenize.token_id[token]
+    else:
+        token += '"'
+        ids.append(tokenize.token_id[token])
     so_far += token
     for _ in range(100):
         logits = model.get_logits_from_input_ids(ids)
@@ -89,7 +98,6 @@ Valid JSON format expected!\n\
         if token in ["!<", "!\n", "\n", "!", "Ċ", "ĊĊ"]:
             break
         if "'" in token and so_far.strip('Ġ') == '{':
-            print("entered")
             token = token.replace("'", '"')
             tok = tokenize.token_id[token]
         if "}" in token:
