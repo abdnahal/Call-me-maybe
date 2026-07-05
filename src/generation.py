@@ -28,7 +28,6 @@ def generate_response(model: Small_LLM_Model, prompt: str,
         logits = tokenize.apply_mask(valid, ids)
         tok = int(argmax(logits))
         so_far += tokenize.id_token[valid[tok]]
-        print(so_far)
         ids.append(tok)
     return so_far
 
@@ -87,6 +86,11 @@ I need valid JSON format with double quotes instead of single quotes!\n\
         token = tokenize.id_token[tok]
         if token in ["!<", "!\n", "\n", "!", "Ċ", "ĊĊ"]:
             break
+        if "'" in token:
+            count = sum([1 for c in so_far if c == '{'])
+            if count == 1:
+                token = token.replace("'", '"')
+                tok = tokenize.token_id[token]
         if "}" in token:
             count = sum([1 for c in so_far if c == '{'])
             count_clo = sum([1 for c in so_far if c == '}'])
