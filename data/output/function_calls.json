@@ -3,60 +3,62 @@
     "prompt": "What is the product of 3 and 5?",
     "name": "fn_format_template",
     "parameters": {
-      "a": 3.0,
-      "b": 5.0
+      "type": "string",
+      "value": "3"
     }
   },
   {
     "prompt": "What is the product of 12 and 4?",
     "name": "fn_multiply_numbers",
     "parameters": {
-      "a": 12.0,
-      "b": 4.0
+      "a": 12,
+      "b": 4
     }
   },
   {
     "prompt": "Is 4 an even number?",
     "name": "fn_is_even",
     "parameters": {
-      "number": 4.0
+      "n": 4
     }
   },
   {
     "prompt": "Is 7 an even number?",
     "name": "fn_is_even",
     "parameters": {
-      "number": 7.0
+      "n": 7
     }
   },
   {
     "prompt": "Calculate compound interest on 1234567.89 at 0.0375 rate for 23 years",
     "name": "fn_calculate_compound_interest",
     "parameters": {
+      "principal": 1234567.89,
       "rate": 0.0375,
-      "time": 23,
-      "amount": 1234567.89
+      "years": 23
     }
   },
   {
     "prompt": "Execute SQL query 'SELECT * FROM users' on the production database",
     "name": "fn_execute_sql_query",
     "parameters": {
-      "sql": "SELECT * FROM users"
+      "query": "SELECT * FROM users",
+      "database": "production"
     }
   },
   {
     "prompt": "Run the query 'INSERT INTO logs VALUES (1, 2, 3)' on the system database",
     "name": "fn_execute_sql_query",
     "parameters": {
-      "sql": "INSERT INTO logs VALUES (1, 2, 3)"
+      "query": "INSERT INTO logs VALUES (1, 2, 3)",
+      "database": "system"
     }
   },
   {
     "prompt": "Read the file at /home/user/data.json with utf-8 encoding",
     "name": "fn_read_file",
     "parameters": {
-      "file_path": "data.json",
+      "path": "path/to/file",
       "encoding": "utf-8"
     }
   },
@@ -64,24 +66,41 @@
     "prompt": "Read C:\\Users\\john\\config.ini with latin-1 encoding",
     "name": "fn_format_template",
     "parameters": {
-      "a": 1,
-      "b": 2
+      "parameters": [
+        {
+          "name": "name",
+          "type": "string",
+          "description": "name of the parameter",
+          "required": true,
+          "default": "default_value"
+        }
+      ]
     }
   },
   {
     "prompt": "Format template: Hello {user}'s profile!",
     "name": "fn_format_template",
     "parameters": {
-      "a": 2.0,
-      "b": 3.0
+      "parameters": [
+        {
+          "name": "name",
+          "values": [
+            {
+              "name": "user",
+              "value": "John"
+            }
+          ]
+        }
+      ]
     }
   },
   {
     "prompt": "Format template: Say \"hello\" to {name}",
     "name": "fn_format_template",
     "parameters": {
-      "a": 2.0,
-      "b": 3.0
+      "name": "name",
+      "type": "string",
+      "required": true
     }
   }
 ]

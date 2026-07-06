@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Dict, Any
 from .llm_sdk.llm_sdk import Small_LLM_Model
 from .tokenization import Tokenization
 from numpy import argmax
@@ -33,49 +33,14 @@ def generate_response(model: Small_LLM_Model, prompt: str,
     return so_far
 
 
-def get_parameters(model: Small_LLM_Model, func: str, prompt: str,
+def get_parameters(model: Small_LLM_Model, func: Dict[str, Any], prompt: str,
                    tokenize: Tokenization) -> str:
-    examp = [
-        {
-            "prompt": "What is the sum of 2 and 3?",
-            "name": "fn_add_numbers",
-            "parameters": {"a": 2.0, "b": 3.0},
-        },
-        {
-            "prompt": "is 3 and odd number?",
-            "name": "fn_is_odd",
-            "parameters": {"number": 3.0},
-        },
-        {
-            "prompt": "Reverse the string 'hello'",
-            "name": "fn_reverse_string",
-            "parameters": {"s": "hello"},
-        },
-        {
-            "prompt": "Replace all vowels in 'Programming is fun' \
-with asterisks",
-            "name": "fn_substitute_string_with_regex",
-            "parameters": {
-                "source_string": "Programming is fun",
-                "regex": "([aeiouAEIOU])",
-                "replacement": "*",
-            },
-        },
-        {
-            "prompt": "Greet mark",
-            "name": "fn_greet",
-            "parameters": {
-                "name": {"s": "Mark"},
-            },
-        },
-    ]
-    prompt = f"Give me the function call parameters.\
-Examples:\n{examp}\n\
+    prompt = f"Give me the function call parameters.\n\
 Valid JSON format expected!\n\
+Parameters format:\n{func['parameters']}\n\
 'prompt': {prompt},\n\
-'name': {func}\n\
+'name': {func['name']}\n\
 'parameters':"
-    print(prompt)
     ids = model.encode(prompt).tolist()[0]
     so_far = ""
     token = ""
@@ -88,7 +53,7 @@ Valid JSON format expected!\n\
         token = token.replace("'", '"')
         ids[-1] = tokenize.token_id[token]
     else:
-        token += '"'
+        token = '{"'
         ids.append(tokenize.token_id[token])
     so_far += token
     for _ in range(100):

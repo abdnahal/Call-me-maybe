@@ -35,8 +35,9 @@ def main():
         response = generate_response(model, prompt, funcs, tokenizer)
         res["prompt"] = prom["prompt"]
         res["name"] = response
-        parameters = get_parameters(model, response, prom["prompt"], tokenizer)
-        parameters = parameters.replace("Ġ", " ")
+        func = [f for f in functions[1] if f['name'] == res['name']]
+        parameters = get_parameters(model, func[0], prom["prompt"], tokenizer)
+        parameters = parameters.replace("Ġ", " ").replace("Ċ", "\n")
         print(parameters)
         res["parameters"] = json.loads(parameters)
         final.append(res)
