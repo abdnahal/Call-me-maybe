@@ -31,10 +31,12 @@ def prompts(filename: str) -> Union[list, Dict]:
             for prompt in prompts:
                 if not isinstance(prompt['prompt'], str):
                     raise TypeError("Prompts should be a string")
+                if not prompt['prompt'].strip():
+                    raise ValueError("Prompts cannot be empty!")
             return prompts
     except json.JSONDecodeError as e:
         print(f'error loading json file {filename}: {e}')
         sys.exit(1)
-    except TypeError as e:
+    except (TypeError, ValueError) as e:
         print(f"Error Parsing '{filename}': {e}")
         sys.exit(1)

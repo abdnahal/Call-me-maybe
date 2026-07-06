@@ -37,7 +37,7 @@ def get_parameters(model: Small_LLM_Model, func: Dict[str, Any], prompt: str,
                    tokenize: Tokenization) -> str:
     prompt = f"Give me the function call parameters.\n\
 Valid JSON format expected!\n\
-Parameters format:\n{func['parameters']}\n\
+Strictly follow the parameters format:\n{func['parameters']}\n\
 'prompt': {prompt},\n\
 'name': {func['name']}\n\
 'parameters':"
