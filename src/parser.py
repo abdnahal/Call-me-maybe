@@ -20,6 +20,7 @@ def functiondefs(filename: str) -> Union[list, Dict]:
         sys.exit(1)
     except ValidationError as e:
         print(e)
+        sys.exit(1)
     return funcs
 
 
@@ -36,3 +37,4 @@ def prompts(filename: str) -> Union[list, Dict]:
         sys.exit(1)
     except TypeError as e:
         print(f"Error Parsing '{filename}': {e}")
+        sys.exit(1)

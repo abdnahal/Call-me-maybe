@@ -35,6 +35,7 @@ def main():
         response = generate_response(model, prompt, funcs, tokenizer)
         res["prompt"] = prom["prompt"]
         res["name"] = response
+        print(response)
         func = [f for f in functions[1] if f['name'] == res['name']]
         parameters = get_parameters(model, func[0], prom["prompt"], tokenizer)
         parameters = parameters.replace("Ġ", " ").replace("Ċ", "\n")

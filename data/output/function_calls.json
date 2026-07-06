@@ -1,5 +1,17 @@
 [
   {
+    "prompt": "what's the sum of 2 and 3?",
+    "name": "fn_format_template",
+    "parameters": {
+      "parameters": [
+        {
+          "name": "name",
+          "type": "string"
+        }
+      ]
+    }
+  },
+  {
     "prompt": "What is the product of 3 and 5?",
     "name": "fn_format_template",
     "parameters": {
@@ -64,17 +76,10 @@
   },
   {
     "prompt": "Read C:\\Users\\john\\config.ini with latin-1 encoding",
-    "name": "fn_format_template",
+    "name": "fn_read_file",
     "parameters": {
-      "parameters": [
-        {
-          "name": "name",
-          "type": "string",
-          "description": "name of the parameter",
-          "required": true,
-          "default": "default_value"
-        }
-      ]
+      "path": "C:\\Users\\john\\config.ini",
+      "encoding": "latin-1"
     }
   },
   {

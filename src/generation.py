@@ -8,10 +8,10 @@ from .validate import Functiondef
 def build_selection_prompt(prompt: str, functions: list[Functiondef]) -> str:
     fn_desc = "\n".join(f"- {f.name}: {f.description}" for f in functions)
     return (
-        f"choose the function that's needed to solve the question.\n"
+        f"choose the function to call from the available functions.\n"
         f"Available functions:\n{fn_desc}\n\n"
-        f"Question: {prompt}\n"
-        f"Function to call to solve the question: "
+        f"Prompt: {prompt}\n"
+        f"Function to call to answer the prompt: "
     )
 
 
