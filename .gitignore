@@ -2,3 +2,4 @@
 Qwen3-0.6B/
 __pycache__/
 output.json
+.mypy_cache

@@ -2,11 +2,11 @@ import argparse
 from typing import Any
 from .parser import functiondefs, prompts
 from .tokenization import Tokenization
-from .llm_sdk.llm_sdk import Small_LLM_Model
+from llm_sdk.llm_sdk import Small_LLM_Model
 from .generation import generate_response, build_selection_prompt
 from .generation import get_parameters
 import json
-# import ast
+import os
 
 
 def argparser() -> Any:
@@ -20,7 +20,7 @@ def argparser() -> Any:
     return args
 
 
-def main():
+def main() -> None:
     print("Hello from call-me-maybe!\n")
     args = argparser()
     functions = functiondefs(args.functions_definition)
@@ -42,8 +42,12 @@ def main():
         print(parameters)
         res["parameters"] = json.loads(parameters)
         final.append(res)
-    with open(args.output, 'w', encoding='utf-8') as f:
-        json.dump(final, f, indent=2)
+    if os.path.exists(args.output):
+        with open(args.output, 'w') as f:
+            json.dump(final, f, indent=2)
+    else:
+        with open(args.output, 'x') as f:
+            json.dump(final, f, indent=2)
 
 
 if __name__ == "__main__":

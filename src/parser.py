@@ -1,11 +1,11 @@
 import json
 import sys
 from .validate import Functiondef
-from typing import Dict, Union
+from typing import Dict, Tuple, List
 from pydantic import ValidationError
 
 
-def functiondefs(filename: str) -> Union[list, Dict]:
+def functiondefs(filename: str) -> Tuple[Functiondef, Dict]:
     try:
         with open(filename, 'r') as f:
             defs = json.load(f)
@@ -24,10 +24,10 @@ def functiondefs(filename: str) -> Union[list, Dict]:
     return funcs
 
 
-def prompts(filename: str) -> Union[list, Dict]:
+def prompts(filename: str) -> List[Dict[str, str]]:
     try:
         with open(filename, 'r') as f:
-            prompts = json.load(f)
+            prompts: List[Dict[str, str]] = json.load(f)
             for prompt in prompts:
                 if not isinstance(prompt['prompt'], str):
                     raise TypeError("Prompts should be a string")

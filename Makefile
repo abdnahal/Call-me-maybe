@@ -15,7 +15,7 @@ run:
 	uv run python -m src
 
 lint:
-	flake8 .
+	flake8 */*.py
 	mypy . --warn-return-any --warn-unused-ignores \
 	  --ignore-missing-imports --disallow-untyped-defs \
 	  --check-untyped-defs
