@@ -1,14 +1,22 @@
 [
   {
-    "prompt": "What is the product of 3 and -5?",
-    "name": "fn_multiply_numbers",
+    "prompt": "Reverse the string 'Hello'",
+    "name": "fn_read_file",
     "parameters": {
-      "a": 3,
-      "b": -5
+      "path": "Hello",
+      "encoding": "utf-8"
     }
   },
   {
-    "prompt": "What is the product of -12 and 4?",
+    "prompt": "add 264545343543454354543546434546 and -3",
+    "name": "fn_add_numbers",
+    "parameters": {
+      "a": 264545343543454354543546434546,
+      "b": -3
+    }
+  },
+  {
+    "prompt": "What is the product of -12 and four?",
     "name": "fn_multiply_numbers",
     "parameters": {
       "a": -12,
@@ -20,13 +28,6 @@
     "name": "fn_is_even",
     "parameters": {
       "n": 4
-    }
-  },
-  {
-    "prompt": "Is 7 an even number?",
-    "name": "fn_is_even",
-    "parameters": {
-      "n": 7
     }
   },
   {
@@ -71,16 +72,15 @@
   },
   {
     "prompt": "Format template: Hello {user}'s profile!",
-    "name": "fn_format_template",
+    "name": "fn_read_file",
     "parameters": {
-      "template": "Hello {user}'s profile!"
+      "path": "C:/Users/username/Documents",
+      "encoding": "utf-8"
     }
   },
   {
     "prompt": "Format template: Say \"hello\" to {name}",
-    "name": "fn_format_template",
-    "parameters": {
-      "template": "hello {name}"
-    }
+    "name": "fn_none",
+    "parameters": {}
   }
 ]

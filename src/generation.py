@@ -1,3 +1,8 @@
+"""Module for generating LLM prompts and responses.
+
+Provides utilities for function selection and parameter generation.
+"""
+
 from typing import List, Dict, Any
 from llm_sdk.llm_sdk import Small_LLM_Model
 from .tokenization import Tokenization
@@ -6,6 +11,15 @@ from .validate import Functiondef
 
 
 def build_selection_prompt(prompt: str, functions: list[Functiondef]) -> str:
+    """Build a prompt for selecting the appropriate function.
+
+    Args:
+        prompt: The user's input prompt/request.
+        functions: List of available function definitions.
+
+    Returns:
+        str: A formatted prompt for the LLM to select the best function.
+    """
     fn_desc = "\n".join(f"- {f.name}: {f.description}" for f in functions)
     fn_desc += "\n- fn_none: none of the functions above"
     return (
@@ -26,6 +40,20 @@ def generate_response(
     possible_values: List[str],
     tokenize: Tokenization,
 ) -> str:
+    """Generate a constrained LLM response from possible values.
+
+    Uses logit masking to constrain the model to only generate tokens
+    that lead to one of the possible values.
+
+    Args:
+        model: The LLM model instance.
+        prompt: The input prompt to the model.
+        possible_values: List of valid output strings to choose from.
+        tokenize: Tokenization utility for token/value mapping.
+
+    Returns:
+        str: The generated response constrained to one of possible_values.
+    """
     so_far = ""
     ids = model.encode(prompt)
     ids = ids.tolist()[0]
@@ -44,6 +72,20 @@ def generate_response(
 
 def get_parameters(model: Small_LLM_Model, func: Dict[str, Any],
                    prompt: str, tokenize: Tokenization) -> str:
+    """Generate JSON parameters for a function based on a user prompt.
+
+    Uses the LLM to generate valid JSON parameters that match the
+    function's parameter schema and satisfy the user's intent.
+
+    Args:
+        model: The LLM model instance.
+        func: Function metadata including name and parameters.
+        prompt: User request describing what parameters to generate.
+        tokenize: Tokenization utility for token/value mapping.
+
+    Returns:
+        str: A JSON string containing the generated parameters.
+    """
 
     prompt = f"You are generating JSON parameters for a function call.\n\
 Strictly use the parameter names and the format from the function \

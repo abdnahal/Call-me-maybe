@@ -1,3 +1,12 @@
+"""Main module for the Call-me-maybe function calling system.
+
+This module orchestrates the end-to-end process of:
+1. Loading function definitions and test prompts
+2. Using an LLM to select appropriate functions based on prompts
+3. Generating parameters for the selected functions
+4. Outputting results to a JSON file
+"""
+
 import argparse
 from typing import Any
 from .parser import functiondefs, prompts
@@ -10,6 +19,12 @@ import os
 
 
 def argparser() -> Any:
+    """Parse command line arguments.
+
+    Returns:
+        Any: Parsed arguments containing paths to functions definition,
+             input prompts, and output file.
+    """
     parser = argparse.ArgumentParser()
     parser.add_argument("--functions_definition",
                         default='data/input/functions_definition.json')
@@ -21,6 +36,12 @@ def argparser() -> Any:
 
 
 def main() -> None:
+    """Execute the main function calling workflow.
+
+    Loads function definitions and test prompts, iterates through each prompt
+    to select appropriate functions and generate parameters, then writes
+    results to an output JSON file.
+    """
     print("Hello from call-me-maybe!\n")
     args = argparser()
     functions = functiondefs(args.functions_definition)
@@ -30,7 +51,6 @@ def main() -> None:
     proms = prompts(args.input)
     funcs = [func.name for func in functions[0]]
     funcs.append('fn_none')
-    print(funcs)
     for prom in proms:
         res = {}
         prompt = build_selection_prompt(prom["prompt"], functions[0])
