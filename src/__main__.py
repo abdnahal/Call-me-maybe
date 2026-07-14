@@ -9,13 +9,13 @@ This module orchestrates the end-to-end process of:
 
 import argparse
 from typing import Any
+from pathlib import Path
 from .parser import functiondefs, prompts
 from .tokenization import Tokenization
 from llm_sdk.llm_sdk import Small_LLM_Model
 from .generation import generate_response, build_selection_prompt
 from .generation import get_parameters
 import json
-import os
 
 
 def argparser() -> Any:
@@ -58,6 +58,7 @@ def main() -> None:
         res["prompt"] = prom["prompt"]
         res["name"] = response
         print(response)
+        parameters = "{}"
         if response == "fn_none":
             res['parameters'] = {}
         else:
@@ -68,12 +69,10 @@ def main() -> None:
             res["parameters"] = json.loads(parameters)
         print(parameters)
         final.append(res)
-    if os.path.exists(args.output):
-        with open(args.output, 'w') as f:
-            json.dump(final, f, indent=2)
-    else:
-        with open(args.output, 'x') as f:
-            json.dump(final, f, indent=2)
+    output_path = Path(args.output)
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    with output_path.open('w') as f:
+        json.dump(final, f, indent=2)
 
 
 if __name__ == "__main__":
