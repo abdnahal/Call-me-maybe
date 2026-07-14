@@ -16,6 +16,6 @@ run:
 
 lint:
 	flake8 */*.py
-	mypy . --warn-return-any --warn-unused-ignores \
+	mypy src --warn-return-any --warn-unused-ignores \
 	  --ignore-missing-imports --disallow-untyped-defs \
 	  --check-untyped-defs

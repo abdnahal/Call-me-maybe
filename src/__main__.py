@@ -28,19 +28,25 @@ def main() -> None:
     final = []
     tokenizer = Tokenization(model)
     proms = prompts(args.input)
+    funcs = [func.name for func in functions[0]]
+    funcs.append('fn_none')
+    print(funcs)
     for prom in proms:
         res = {}
-        funcs = [func.name for func in functions[0]]
         prompt = build_selection_prompt(prom["prompt"], functions[0])
         response = generate_response(model, prompt, funcs, tokenizer)
         res["prompt"] = prom["prompt"]
         res["name"] = response
         print(response)
-        func = [f for f in functions[1] if f['name'] == res['name']]
-        parameters = get_parameters(model, func[0], prom["prompt"], tokenizer)
-        parameters = parameters.replace("Ġ", " ").replace("Ċ", "\n")
+        if response == "fn_none":
+            res['parameters'] = {}
+        else:
+            func = [f for f in functions[1] if f['name'] == res['name']]
+            parameters = get_parameters(model, func[0], prom["prompt"],
+                                        tokenizer)
+            parameters = parameters.replace("Ġ", " ").replace("Ċ", "\n")
+            res["parameters"] = json.loads(parameters)
         print(parameters)
-        res["parameters"] = json.loads(parameters)
         final.append(res)
     if os.path.exists(args.output):
         with open(args.output, 'w') as f:

@@ -15,6 +15,21 @@
     }
   },
   {
+    "name": "fn_add_numbers",
+    "description": "add two numbers together and return their sum.",
+    "parameters": {
+      "a": {
+        "type": "number"
+      },
+      "b": {
+        "type": "number"
+      }
+    },
+    "returns": {
+      "type": "number"
+    }
+  },
+  {
     "name": "fn_is_even",
     "description": "Check if an integer is even, returns True if even, False if odd.",
     "parameters": {
@@ -67,18 +82,6 @@
         "type": "string"
       },
       "encoding": {
-        "type": "string"
-      }
-    },
-    "returns": {
-      "type": "string"
-    }
-  },
-  {
-    "name": "fn_format_template",
-    "description": "Format a template string containing placeholders.",
-    "parameters": {
-      "template": {
         "type": "string"
       }
     },

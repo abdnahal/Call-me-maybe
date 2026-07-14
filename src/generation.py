@@ -7,10 +7,14 @@ from .validate import Functiondef
 
 def build_selection_prompt(prompt: str, functions: list[Functiondef]) -> str:
     fn_desc = "\n".join(f"- {f.name}: {f.description}" for f in functions)
-    fn_desc = fn_desc + "\n- fn_unkown: unkown function"
+    fn_desc += "\n- fn_none: none of the functions above"
     return (
-        f"choose the function to call from the available functions.\n"
+        f"You are a helpful assistant in the tool selection process.\n"
+        f"Choose the right function to call that matches the prompt's \
+need from the available functions.\n"
         f"Available functions:\n{fn_desc}\n\n"
+        f"Choose fn_none if there's no matching function to call.\n"
+        f"Example: To check the weather I should call fn_temperature"
         f"Prompt: {prompt}\n"
         f"Function to call to answer the prompt: "
     )
@@ -42,11 +46,13 @@ def get_parameters(model: Small_LLM_Model, func: Dict[str, Any],
                    prompt: str, tokenize: Tokenization) -> str:
 
     prompt = f"You are generating JSON parameters for a function call.\n\
-Use exactly the parameter names from the function definition.\n\
+Strictly use the parameter names and the format from the function \
+definition.\n\
+Don't add or ignore any parameter!\n\
 Use literal values, not type descriptions.\n\
 Rules:\n\
 - If a parameter type is 'integer', output an integer literal like 7.\n\
-- If a parameter type is 'number', output a numeric literal like 3 or 3.14.\n\
+- If a parameter type is 'number', output a float like 3.0 or 3.14.\n\
 - If a parameter type is 'string', output a JSON string value.\n\
 - If a parameter type is 'boolean', output true or false.\n\
 - Never output 'type': '...' objects.\n\
@@ -64,6 +70,7 @@ Output:"
 # 'prompt': {prompt},\n\
 # 'name': {func['name']}\n\
 # 'parameters':"
+
     ids = model.encode(prompt).tolist()[0]
     so_far: str = ""
     token = ""

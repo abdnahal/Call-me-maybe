@@ -40,3 +40,6 @@ def prompts(filename: str) -> List[Dict[str, str]]:
     except (TypeError, ValueError) as e:
         print(f"Error Parsing '{filename}': {e}")
         sys.exit(1)
+    except FileNotFoundError as e:
+        print(f"Error opening {filename}: {e}")
+        sys.exit(1)
