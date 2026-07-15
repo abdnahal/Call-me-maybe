@@ -21,14 +21,13 @@ def build_selection_prompt(prompt: str, functions: list[Functiondef]) -> str:
         str: A formatted prompt for the LLM to select the best function.
     """
     fn_desc = "\n".join(f"- {f.name}: {f.description}" for f in functions)
-    fn_desc += "\n- fn_none: none of the functions above"
+    fn_desc += "\n- fn_none: none of the available functions"
     return (
         f"You are a helpful assistant in the tool selection process.\n"
         f"Choose the right function to call that matches the prompt's \
 need from the available functions.\n"
         f"Available functions:\n{fn_desc}\n\n"
-        f"Choose fn_none if there's no matching function to call.\n"
-        f"Example: To check the weather I should call fn_temperature"
+        f"Choose fn_none if there's no matching tool to call.\n"
         f"Prompt: {prompt}\n"
         f"Function to call to answer the prompt: "
     )
@@ -125,6 +124,13 @@ Output:"
     ids.append(tokenize.token_id[token])
     so_far += token
     for _ in range(100):
+        par_in = sum([1 for par in func['parameters'].keys() if par in so_far])
+        par = sum([1 for _ in func['parameters'].keys()])
+        if par == par_in:
+            so_far = so_far.strip(',')
+            if not so_far.endswith('}'):
+                so_far += '}'
+            return so_far
         logits = model.get_logits_from_input_ids(ids)
         tok = argmax(logits)
         token = tokenize.id_token[tok]
