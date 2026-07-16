@@ -66,8 +66,14 @@ def main() -> None:
             parameters = get_parameters(model, func[0], prom["prompt"],
                                         tokenizer)
             parameters = parameters.replace("Ġ", " ").replace("Ċ", "\n")
+            print(parameters)
             res["parameters"] = json.loads(parameters)
-        print(parameters)
+            for key in res['parameters'].keys():
+                try:
+                    if func[0]['parameters'][key]['type'] == 'number':
+                        res['parameters'][key] = float(res['parameters'][key])
+                except KeyError:
+                    continue
         final.append(res)
     output_path = Path(args.output)
     output_path.parent.mkdir(parents=True, exist_ok=True)

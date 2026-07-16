@@ -23,13 +23,16 @@ def build_selection_prompt(prompt: str, functions: list[Functiondef]) -> str:
     fn_desc = "\n".join(f"- {f.name}: {f.description}" for f in functions)
     fn_desc += "\n- fn_none: none of the available functions"
     return (
-        f"You are a helpful assistant in the tool selection process.\n"
-        f"Choose the right function to call that matches the prompt's \
-need from the available functions.\n"
+        f"You are a careful tool-selection assistant.\n"
+        f"Select exactly one function that best matches the user's request.\n"
+        f"Compare the request against every available function.\n"
+        f"before answering.\n"
+        f"Do not default to the most common or most general function.\n"
+        f"If no function clearly matches, answer with `fn_none`.\n"
+        f"Respond with only the function name, and nothing else.\n"
         f"Available functions:\n{fn_desc}\n\n"
-        f"Choose fn_none if there's no matching tool to call.\n"
-        f"Prompt: {prompt}\n"
-        f"Function to call to answer the prompt: "
+        f"User request: {prompt}\n"
+        f"Chosen function: "
     )
 
 
@@ -86,16 +89,17 @@ def get_parameters(model: Small_LLM_Model, func: Dict[str, Any],
         str: A JSON string containing the generated parameters.
     """
 
-    prompt = f"You are generating JSON parameters for a function call.\n\
+    prompt = f"You are extracting JSON parameters for a function call.\n\
 Strictly use the parameter names and the format from the function \
 definition.\n\
-Don't add or ignore any parameter!\n\
 Use literal values, not type descriptions.\n\
 Rules:\n\
 - If a parameter type is 'integer', output an integer literal like 7.\n\
 - If a parameter type is 'number', output a float like 3.0 or 3.14.\n\
 - If a parameter type is 'string', output a JSON string value.\n\
 - If a parameter type is 'boolean', output true or false.\n\
+- Extract the parameters from the user's prompt; do not apply any changes to\n\
+    them.\n\
 - Never output 'type': '...' objects.\n\
 - Never nest the parameter schema inside the output.\n\
 Function name: {func['name']}\n\
@@ -124,13 +128,28 @@ Output:"
     ids.append(tokenize.token_id[token])
     so_far += token
     for _ in range(100):
-        par_in = sum([1 for par in func['parameters'].keys() if par in so_far])
         par = sum([1 for _ in func['parameters'].keys()])
-        if par == par_in:
-            so_far = so_far.strip(',')
-            if not so_far.endswith('}'):
-                so_far += '}'
-            return so_far
+        for i, para in enumerate(func['parameters'].keys()):
+            if i+1 == par:
+                if '"' + para + '":' in so_far:
+                    if so_far.strip().endswith(':'):
+                        token = ':'
+                        while ',' not in token:
+                            logits = model.get_logits_from_input_ids(ids)
+                            tok = argmax(logits)
+                            token = tokenize.id_token[tok]
+                            ids.append(tok)
+                            so_far += token
+                            count = sum([1 for c in so_far if c == '{'])
+                            count_clo = sum([1 for c in so_far if c == "}"])
+                            if '}' in token and count == count_clo:
+                                break
+                        if so_far.strip('Ġ').endswith(','):
+                            so_far = so_far.strip('Ġ').strip(',')
+                            so_far += '}'
+                        elif not so_far.strip('Ġ').endswith('}'):
+                            so_far = so_far.split('}')[0] + '}'
+                        return so_far
         logits = model.get_logits_from_input_ids(ids)
         tok = argmax(logits)
         token = tokenize.id_token[tok]
