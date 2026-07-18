@@ -50,7 +50,7 @@ def main() -> None:
     tokenizer = Tokenization(model)
     proms = prompts(args.input)
     funcs = [func.name for func in functions[0]]
-    funcs.append('fn_none')
+    funcs.append('fn_no_match')
     for prom in proms:
         res = {}
         prompt = build_selection_prompt(prom["prompt"], functions[0])
@@ -59,7 +59,7 @@ def main() -> None:
         res["name"] = response
         print(response)
         parameters = "{}"
-        if response == "fn_none":
+        if response == "fn_no_match":
             res['parameters'] = {}
         else:
             func = [f for f in functions[1] if f['name'] == res['name']]

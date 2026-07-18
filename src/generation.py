@@ -21,14 +21,14 @@ def build_selection_prompt(prompt: str, functions: list[Functiondef]) -> str:
         str: A formatted prompt for the LLM to select the best function.
     """
     fn_desc = "\n".join(f"- {f.name}: {f.description}" for f in functions)
-    fn_desc += "\n- fn_none: none of the available functions"
+    fn_desc += "\n- fn_no_match: none of the available functions"
     return (
         f"You are a careful tool-selection assistant.\n"
         f"Select exactly one function that best matches the user's request.\n"
         f"Compare the request against every available function.\n"
         f"before answering.\n"
         f"Do not default to the most common or most general function.\n"
-        f"If no function clearly matches, answer with `fn_none`.\n"
+        f"If no function clearly matches, answer with `fn_no_match`.\n"
         f"Respond with only the function name, and nothing else.\n"
         f"Available functions:\n{fn_desc}\n\n"
         f"User request: {prompt}\n"
@@ -63,12 +63,14 @@ def generate_response(
         if so_far in possible_values:
             break
         valid = tokenize.get_valid_tokens(so_far, possible_values)
+        # print([tokenize.id_token[tok] for tok in valid])
         if not valid:
             break
         logits = tokenize.apply_mask(valid, ids)
         tok = int(argmax(logits))
         so_far += tokenize.id_token[valid[tok]]
-        ids.append(tok)
+        # print(so_far)
+        ids.append(valid[tok])
     return so_far
 
 
@@ -145,24 +147,32 @@ Output:"
                             if '}' in token and count == count_clo:
                                 break
                         if so_far.strip('Ġ').endswith(','):
-                            so_far = so_far.strip('Ġ').strip(',')
-                            so_far += '}'
+                            print("here")
+                            so_far = so_far.strip('Ġ').strip(token)
+                            deli = ids.pop()
+                            print(f"old: {tokenize.id_token[deli]}")
+                            valid = ['}', '"}', "Ġ}", '}Ċ']
+                            logits = tokenize.apply_mask([
+                                tokenize.token_id[tok] for tok in valid], ids)
+                            print(logits)
+                            tok = int(argmax(logits))
+                            print(valid[tok])
+                            ids.append(tokenize.token_id[valid[tok]])
+                            so_far += valid[tok]
                         elif not so_far.strip('Ġ').endswith('}'):
                             so_far = so_far.split('}')[0] + '}'
                         return so_far
+        print(so_far)
         logits = model.get_logits_from_input_ids(ids)
         tok = argmax(logits)
         token = tokenize.id_token[tok]
         if "'" in token and so_far.strip("Ġ") == '{"':
             token = token.replace("'", '"')
             tok = tokenize.token_id[token]
-        if "}" in token:
-            count = sum([1 for c in so_far if c == "{"])
+        if '}' in so_far:
+            count = sum([1 for c in so_far if c == '{'])
             count_clo = sum([1 for c in so_far if c == "}"])
-            clo_tok = sum([1 for c in token if c == "}"])
-            if count <= count_clo + clo_tok:
-                so_far += token.split("}")[0]
-                so_far += "}" * (count - count_clo)
+            if count == count_clo:
                 return so_far
         so_far += token
         ids.append(tok)
