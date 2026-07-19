@@ -42,43 +42,52 @@ def main() -> None:
     to select appropriate functions and generate parameters, then writes
     results to an output JSON file.
     """
-    print("Hello from call-me-maybe!\n")
-    args = argparser()
-    functions = functiondefs(args.functions_definition)
-    model = Small_LLM_Model()
-    final = []
-    tokenizer = Tokenization(model)
-    proms = prompts(args.input)
-    funcs = [func.name for func in functions[0]]
-    funcs.append('fn_no_match')
-    for prom in proms:
-        res = {}
-        prompt = build_selection_prompt(prom["prompt"], functions[0])
-        response = generate_response(model, prompt, funcs, tokenizer)
-        res["prompt"] = prom["prompt"]
-        res["name"] = response
-        print(response)
-        parameters = "{}"
-        if response == "fn_no_match":
-            res['parameters'] = {}
-        else:
-            func = [f for f in functions[1] if f['name'] == res['name']]
-            parameters = get_parameters(model, func[0], prom["prompt"],
-                                        tokenizer)
-            parameters = parameters.replace("Ġ", " ").replace("Ċ", "\n")
-            print(parameters)
-            res["parameters"] = json.loads(parameters)
-            for key in res['parameters'].keys():
+    print("Initiating Function calls generation!\n")
+    try:
+        args = argparser()
+        functions = functiondefs(args.functions_definition)
+        model = Small_LLM_Model()
+        final = []
+        tokenizer = Tokenization(model)
+        proms = prompts(args.input)
+        funcs = [func.name for func in functions[0]]
+        funcs.append('fn_no_match')
+        for prom in proms[0]:
+            res = {}
+            prompt = build_selection_prompt(prom["prompt"], functions[0])
+            response = generate_response(model, prompt, funcs, tokenizer)
+            res["prompt"] = prom["prompt"]
+            res["name"] = response
+            print(f"Function name: {response}")
+            parameters = "{}"
+            if response == "fn_no_match":
+                res['parameters'] = {}
+            else:
+                func = [f for f in functions[1] if f['name'] == res['name']]
+                parameters = get_parameters(model, func[0], prom["prompt"],
+                                            tokenizer)
+                parameters = parameters.replace("Ġ", " ").replace("Ċ", "\n")
                 try:
-                    if func[0]['parameters'][key]['type'] == 'number':
-                        res['parameters'][key] = float(res['parameters'][key])
-                except KeyError:
-                    continue
-        final.append(res)
-    output_path = Path(args.output)
-    output_path.parent.mkdir(parents=True, exist_ok=True)
-    with output_path.open('w') as f:
-        json.dump(final, f, indent=2)
+                    res["parameters"] = json.loads(parameters)
+                except json.JSONDecodeError as e:
+                    print(f"Decoding json failed: {e}\n")
+                    print("Resuming Generation!\n")
+                    res['parameters'] = {}
+                for key in res['parameters'].keys():
+                    try:
+                        if func[0]['parameters'][key]['type'] == 'number':
+                            res['parameters'][key] = float(res['parameters'][
+                                key])
+                    except KeyError:
+                        continue
+            print(f"Parameters: {res['parameters']}\n")
+            final.append(res)
+        output_path = Path(args.output)
+        output_path.parent.mkdir(parents=True, exist_ok=True)
+        with output_path.open('w') as f:
+            json.dump(final, f, indent=2)
+    except KeyboardInterrupt:
+        print("\nStop interrupting me :(\n")
 
 
 if __name__ == "__main__":

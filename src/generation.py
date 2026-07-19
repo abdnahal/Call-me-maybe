@@ -147,22 +147,17 @@ Output:"
                             if '}' in token and count == count_clo:
                                 break
                         if so_far.strip('Ġ').endswith(','):
-                            print("here")
                             so_far = so_far.strip('Ġ').strip(token)
-                            deli = ids.pop()
-                            print(f"old: {tokenize.id_token[deli]}")
+                            _ = ids.pop()
                             valid = ['}', '"}', "Ġ}", '}Ċ']
                             logits = tokenize.apply_mask([
                                 tokenize.token_id[tok] for tok in valid], ids)
-                            print(logits)
                             tok = int(argmax(logits))
-                            print(valid[tok])
                             ids.append(tokenize.token_id[valid[tok]])
                             so_far += valid[tok]
                         elif not so_far.strip('Ġ').endswith('}'):
                             so_far = so_far.split('}')[0] + '}'
                         return so_far
-        print(so_far)
         logits = model.get_logits_from_input_ids(ids)
         tok = argmax(logits)
         token = tokenize.id_token[tok]

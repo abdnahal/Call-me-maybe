@@ -8,6 +8,10 @@ from pydantic import BaseModel, Field
 from typing import Dict
 
 
+class Prompts(BaseModel):
+    prompt: str = Field(min_length=3)
+
+
 class FunctionParam(BaseModel):
     """Represents a function parameter with type information.
 
