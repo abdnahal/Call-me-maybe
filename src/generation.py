@@ -6,7 +6,7 @@ Provides utilities for function selection and parameter generation.
 from typing import List, Dict, Any
 from llm_sdk.llm_sdk import Small_LLM_Model
 from .tokenization import Tokenization
-from numpy import argmax
+import torch
 from .validate import Functiondef
 
 
@@ -66,8 +66,8 @@ def generate_response(
         # print([tokenize.id_token[tok] for tok in valid])
         if not valid:
             break
-        logits = tokenize.apply_mask(valid, ids)
-        tok = int(argmax(logits))
+        logits = torch.tensor(tokenize.apply_mask(valid, ids))
+        tok = int(torch.argmax(logits))
         so_far += tokenize.id_token[valid[tok]]
         # print(so_far)
         ids.append(valid[tok])
@@ -102,6 +102,8 @@ Rules:\n\
 - If a parameter type is 'boolean', output true or false.\n\
 - Extract the parameters from the user's prompt; do not apply any changes to\n\
     them.\n\
+- Extract argument values directly from the user prompt text, \
+Never change them!\n\
 - Never output 'type': '...' objects.\n\
 - Never nest the parameter schema inside the output.\n\
 Function name: {func['name']}\n\
@@ -120,14 +122,13 @@ Output:"
 
     ids = model.encode(prompt).tolist()[0]
     so_far: str = ""
-    token = ""
-    while "{" not in token:
-        logits = model.get_logits_from_input_ids(ids)
-        tok = argmax(logits)
-        token = tokenize.id_token[tok]
-        ids.append(tok)
-    token = '{"'
-    ids.append(tokenize.token_id[token])
+    token = ''
+    valid = ['{"']
+    valid = [tokenize.token_id[valid[0]]]
+    logits = torch.tensor(tokenize.apply_mask(valid, ids))
+    tok = int(torch.argmax(logits))
+    token = tokenize.id_token[valid[tok]]
+    ids.append(valid[tok])
     so_far += token
     for _ in range(100):
         par = sum([1 for _ in func['parameters'].keys()])
@@ -137,8 +138,9 @@ Output:"
                     if so_far.strip().endswith(':'):
                         token = ':'
                         while ',' not in token:
-                            logits = model.get_logits_from_input_ids(ids)
-                            tok = argmax(logits)
+                            logits = torch.tensor(
+                                model.get_logits_from_input_ids(ids))
+                            tok = int(torch.argmax(logits))
                             token = tokenize.id_token[tok]
                             ids.append(tok)
                             so_far += token
@@ -152,14 +154,15 @@ Output:"
                             valid = ['}', '"}', "Ġ}", '}Ċ']
                             logits = tokenize.apply_mask([
                                 tokenize.token_id[tok] for tok in valid], ids)
-                            tok = int(argmax(logits))
+                            logits = torch.tensor(logits)
+                            tok = int(torch.argmax(logits))
                             ids.append(tokenize.token_id[valid[tok]])
                             so_far += valid[tok]
                         elif not so_far.strip('Ġ').endswith('}'):
                             so_far = so_far.split('}')[0] + '}'
                         return so_far
-        logits = model.get_logits_from_input_ids(ids)
-        tok = argmax(logits)
+        logits = torch.tensor(model.get_logits_from_input_ids(ids))
+        tok = int(torch.argmax(logits))
         token = tokenize.id_token[tok]
         if "'" in token and so_far.strip("Ġ") == '{"':
             token = token.replace("'", '"')
