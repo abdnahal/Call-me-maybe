@@ -56,30 +56,28 @@ def main() -> None:
             res = {}
             prompt = build_selection_prompt(prom["prompt"], functions[0])
             response = generate_response(model, prompt, funcs, tokenizer)
-            res["prompt"] = prom["prompt"]
             res["name"] = response
-            print(f"Function name: {response}")
-            parameters = "{}"
+            res["prompt"] = prom["prompt"]
             if response == "fn_no_match":
+                continue
+            print(f"Function name: {response}")
+            func = [f for f in functions[1] if f['name'] == res['name']]
+            parameters = get_parameters(model, func[0], prom["prompt"],
+                                        tokenizer)
+            parameters = parameters.replace("Ġ", " ").replace("Ċ", "\n")
+            try:
+                res["parameters"] = json.loads(parameters)
+            except json.JSONDecodeError as e:
+                print(f"Decoding json failed: {e}\n")
+                print("Resuming Generation!\n")
                 res['parameters'] = {}
-            else:
-                func = [f for f in functions[1] if f['name'] == res['name']]
-                parameters = get_parameters(model, func[0], prom["prompt"],
-                                            tokenizer)
-                parameters = parameters.replace("Ġ", " ").replace("Ċ", "\n")
+            for key in res['parameters'].keys():
                 try:
-                    res["parameters"] = json.loads(parameters)
-                except json.JSONDecodeError as e:
-                    print(f"Decoding json failed: {e}\n")
-                    print("Resuming Generation!\n")
-                    res['parameters'] = {}
-                for key in res['parameters'].keys():
-                    try:
-                        if func[0]['parameters'][key]['type'] == 'number':
-                            res['parameters'][key] = float(res['parameters'][
-                                key])
-                    except KeyError:
-                        continue
+                    if func[0]['parameters'][key]['type'] == 'number':
+                        res['parameters'][key] = float(res['parameters'][
+                            key])
+                except KeyError:
+                    continue
             print(f"Parameters: {res['parameters']}\n")
             final.append(res)
         output_path = Path(args.output)

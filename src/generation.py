@@ -91,17 +91,16 @@ def get_parameters(model: Small_LLM_Model, func: Dict[str, Any],
         str: A JSON string containing the generated parameters.
     """
 
-    prompt = f"You are extracting JSON parameters for a function call.\n\
+    prompt = f"You are generating JSON parameters for a function call.\n\
 Strictly use the parameter names and the format from the function \
 definition.\n\
+Never ignore any parameter!\n\
 Use literal values, not type descriptions.\n\
 Rules:\n\
 - If a parameter type is 'integer', output an integer literal like 7.\n\
 - If a parameter type is 'number', output a float like 3.0 or 3.14.\n\
 - If a parameter type is 'string', output a JSON string value.\n\
 - If a parameter type is 'boolean', output true or false.\n\
-- Extract the parameters from the user's prompt; do not apply any changes to\n\
-    them.\n\
 - Extract argument values directly from the user prompt text, \
 Never change them!\n\
 - Never output 'type': '...' objects.\n\

@@ -7,7 +7,7 @@ prompts from JSON files with error handling.
 import json
 import sys
 from .validate import Functiondef, Prompts
-from typing import Dict, Tuple, List
+from typing import Dict, Tuple, List, Any
 from pydantic import ValidationError
 
 
@@ -44,7 +44,7 @@ def functiondefs(filename: str) -> Tuple[Functiondef, Dict]:
     return funcs
 
 
-def prompts(filename: str) -> List[Dict[str, str]]:
+def prompts(filename: str) -> Tuple[List[Dict[str, str]], List[Any]]:
     """Load and validate test prompts from a JSON file.
 
     Args:
@@ -62,6 +62,8 @@ def prompts(filename: str) -> List[Dict[str, str]]:
         with open(filename, 'r') as f:
             prompts: List[Dict[str, str]] = json.load(f)
             prmpts = [Prompts(**prompt) for prompt in prompts]
+            if len(prmpts) == 0:
+                raise ValidationError("No prompt passed!")
             return (prompts, prmpts)
     except json.JSONDecodeError as e:
         print(f'error loading json file {filename}: {e}')
