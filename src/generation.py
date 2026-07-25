@@ -63,10 +63,9 @@ def generate_response(
         if so_far in possible_values:
             break
         valid = tokenize.get_valid_tokens(so_far, possible_values)
-        # print([tokenize.id_token[tok] for tok in valid])
         if not valid:
             break
-        logits = torch.tensor(tokenize.apply_mask(valid, ids))
+        logits = tokenize.apply_mask(valid, ids)
         tok = int(torch.argmax(logits))
         so_far += tokenize.id_token[valid[tok]]
         # print(so_far)
@@ -124,7 +123,7 @@ Output:"
     token = ''
     valid = ['{"']
     valid = [tokenize.token_id[valid[0]]]
-    logits = torch.tensor(tokenize.apply_mask(valid, ids))
+    logits = tokenize.apply_mask(valid, ids)
     tok = int(torch.argmax(logits))
     token = tokenize.id_token[valid[tok]]
     ids.append(valid[tok])
@@ -153,7 +152,6 @@ Output:"
                             valid = ['}', '"}', "Ġ}", '}Ċ']
                             logits = tokenize.apply_mask([
                                 tokenize.token_id[tok] for tok in valid], ids)
-                            logits = torch.tensor(logits)
                             tok = int(torch.argmax(logits))
                             ids.append(tokenize.token_id[valid[tok]])
                             so_far += valid[tok]

@@ -63,7 +63,7 @@ def prompts(filename: str) -> Tuple[List[Dict[str, str]], List[Any]]:
             prompts: List[Dict[str, str]] = json.load(f)
             prmpts = [Prompts(**prompt) for prompt in prompts]
             if len(prmpts) == 0:
-                raise ValidationError("No prompt passed!")
+                raise ValueError("No prompt passed!")
             return (prompts, prmpts)
     except json.JSONDecodeError as e:
         print(f'error loading json file {filename}: {e}')
@@ -71,7 +71,7 @@ def prompts(filename: str) -> Tuple[List[Dict[str, str]], List[Any]]:
     except FileNotFoundError as e:
         print(f"Error opening {filename}: {e}")
         sys.exit(1)
-    except ValidationError as e:
+    except ValueError as e:
         print(e)
         sys.exit(1)
     return prompts

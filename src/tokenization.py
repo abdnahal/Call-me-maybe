@@ -7,6 +7,7 @@ applying logit masks to constrain LLM output to valid tokens.
 import json
 from typing import List, Dict, Any
 from llm_sdk.llm_sdk import Small_LLM_Model
+import torch
 
 
 class Tokenization:
@@ -85,7 +86,7 @@ class Tokenization:
                     valid.append(id)
         return valid
 
-    def apply_mask(self, valid: List[int], ids: List[int]) -> List[float]:
+    def apply_mask(self, valid: List[int], ids: List[int]) -> torch.Tensor:
         """Apply logit mask to constrain output to valid tokens.
 
         Args:
@@ -96,5 +97,6 @@ class Tokenization:
             List[float]: Logit scores for the valid tokens only.
         """
         logits = self.model.get_logits_from_input_ids(ids)
-        masked = [logits[tok] for tok in valid]
-        return masked
+        logits = torch.tensor(logits)
+        valid_ids = torch.tensor(valid)
+        return logits[valid_ids]
