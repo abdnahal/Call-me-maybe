@@ -8,7 +8,7 @@ This module orchestrates the end-to-end process of:
 """
 
 import argparse
-from typing import Any
+from typing import Any, Dict
 from pathlib import Path
 from .parser import functiondefs, prompts
 from .tokenization import Tokenization
@@ -34,6 +34,19 @@ def argparser() -> Any:
     args = parser.parse_args()
     return args
 
+def fix(paramteres: str) -> Dict[str, Any]:
+    count = sum([1 for c in paramteres if c == '{'])
+    count_clo = sum([1 for c in paramteres if c == '}'])
+    if count != count_clo:
+        paramteres += '}' * (count - count_clo)
+    else:
+        if not paramteres.endswith('}'):
+            paramteres = paramteres.split('}')[0] + '}'
+    try:
+        data = (json.load(paramteres), 1)
+    except json.JSONDecodeError:
+        data[1] = 0
+    return data
 
 def main() -> None:
     """Execute the main function calling workflow.
@@ -65,12 +78,21 @@ def main() -> None:
             parameters = get_parameters(model, func[0], prom["prompt"],
                                         tokenizer)
             parameters = parameters.replace("Ġ", " ").replace("Ċ", "\n")
+            print(parameters)
             try:
                 res["parameters"] = json.loads(parameters)
+                print(f"Parameters: {res['parameters']}\n")
             except json.JSONDecodeError as e:
                 print(f"Decoding json failed: {e}\n")
-                print("Resuming Generation!\n")
-                res['parameters'] = {}
+                print("Attempting fix\n")
+                data = fix(parameters)
+                if data[1] == 0:
+                    print(f"Decoding json failed: {e}\n")
+                    print("Resuming Generation!\n")
+                    res['parameters'] = {}
+                else:
+                    print("Fixed!!")
+                    res['parameters'] = data[0]
             for key in res['parameters'].keys():
                 try:
                     if func[0]['parameters'][key]['type'] == 'number':
@@ -78,7 +100,6 @@ def main() -> None:
                             key])
                 except KeyError:
                     continue
-            print(f"Parameters: {res['parameters']}\n")
             final.append(res)
         output_path = Path(args.output)
         output_path.parent.mkdir(parents=True, exist_ok=True)

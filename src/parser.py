@@ -30,6 +30,10 @@ def functiondefs(filename: str) -> Tuple[Functiondef, Dict]:
         with open(filename, 'r') as f:
             defs = json.load(f)
             funcs = [Functiondef(**item) for item in defs]
+            for dct in defs:
+                for key in dct.keys():
+                    if key not in ["name", "returns", "parameters", "description"]:
+                        raise ValueError(f"Unkown key detected: {key}")
             # funcs.clear()
             return (funcs, defs)
     except json.JSONDecodeError as e:
@@ -38,7 +42,7 @@ def functiondefs(filename: str) -> Tuple[Functiondef, Dict]:
     except FileNotFoundError:
         print(f"File '{filename}' Not found")
         sys.exit(1)
-    except ValidationError as e:
+    except (ValidationError, ValueError) as e:
         print(e)
         sys.exit(1)
     return funcs

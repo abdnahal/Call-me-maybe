@@ -1,9 +1,9 @@
 [
   {
     "name": "fn_add_numbers",
-    "prompt": "What is the sum of 2 and 3?",
+    "prompt": "What is the sum of 999999999999999999999999 and 3?",
     "parameters": {
-      "a": 2.0,
+      "a": 1e+24,
       "b": 3.0
     }
   },

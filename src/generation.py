@@ -128,36 +128,35 @@ Output:"
     token = tokenize.id_token[valid[tok]]
     ids.append(valid[tok])
     so_far += token
+    print(so_far)
     for _ in range(100):
         par = sum([1 for _ in func['parameters'].keys()])
         for i, para in enumerate(func['parameters'].keys()):
             if i+1 == par:
                 if '"' + para + '":' in so_far:
-                    if so_far.strip().endswith(':'):
-                        token = ':'
-                        while ',' not in token:
-                            logits = torch.tensor(
-                                model.get_logits_from_input_ids(ids))
-                            tok = int(torch.argmax(logits))
-                            token = tokenize.id_token[tok]
-                            ids.append(tok)
-                            so_far += token
-                            count = sum([1 for c in so_far if c == '{'])
-                            count_clo = sum([1 for c in so_far if c == "}"])
-                            if '}' in token and count == count_clo:
-                                break
-                        if so_far.strip('Ġ').endswith(','):
-                            so_far = so_far.strip('Ġ').strip(token)
-                            _ = ids.pop()
-                            valid = ['}', '"}', "Ġ}", '}Ċ']
-                            logits = tokenize.apply_mask([
-                                tokenize.token_id[tok] for tok in valid], ids)
-                            tok = int(torch.argmax(logits))
-                            ids.append(tokenize.token_id[valid[tok]])
-                            so_far += valid[tok]
-                        elif not so_far.strip('Ġ').endswith('}'):
-                            so_far = so_far.split('}')[0] + '}'
-                        return so_far
+                    while ',' not in token:
+                        logits = torch.tensor(
+                            model.get_logits_from_input_ids(ids))
+                        tok = int(torch.argmax(logits))
+                        token = tokenize.id_token[tok]
+                        ids.append(tok)
+                        so_far += token
+                        count = sum([1 for c in so_far if c == '{'])
+                        count_clo = sum([1 for c in so_far if c == "}"])
+                        if '}' in token and count == count_clo:
+                            break
+                    if ',' in token:
+                        so_far = so_far.strip('Ġ').strip(token)
+                        _ = ids.pop()
+                        valid = ['}', '"}', "Ġ}", '}Ċ']
+                        logits = tokenize.apply_mask([
+                            tokenize.token_id[tok] for tok in valid], ids)
+                        tok = int(torch.argmax(logits))
+                        ids.append(tokenize.token_id[valid[tok]])
+                        so_far += valid[tok]
+                    elif not so_far.strip('Ġ').endswith('}'):
+                        so_far = so_far.split('}')[0] + '}'
+                    return so_far
         logits = torch.tensor(model.get_logits_from_input_ids(ids))
         tok = int(torch.argmax(logits))
         token = tokenize.id_token[tok]
@@ -170,5 +169,6 @@ Output:"
             if count == count_clo:
                 return so_far
         so_far += token
+        print(so_far)
         ids.append(tok)
     return so_far
